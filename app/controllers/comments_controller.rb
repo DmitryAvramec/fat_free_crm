@@ -13,11 +13,12 @@ class CommentsController < ApplicationController
   def index
     @commentable = extract_commentable_name(params)
     if @commentable
-      @asset = @commentable.classify.constantize.my(current_user).find(params[:"#{@commentable}_id"])
+      asset = find_class(@commentable)
+      @asset = asset.my(current_user).find(params[:"#{@commentable}_id"])
       @comments = @asset.comments.order("created_at DESC")
     end
     respond_with(@comments) do |format|
-      format.html { redirect_to @asset }
+      format.html { redirect_to @asset.merge(:only_path => true) }
     end
   rescue ActiveRecord::RecordNotFound # Kicks in if @asset was not found.
     flash[:warning] = t(:msg_assets_not_available, "notes")
@@ -33,9 +34,9 @@ class CommentsController < ApplicationController
   def edit
     @comment = Comment.find(params[:id])
 
-    model = @comment.commentable_type
+    model = find_class(@comment.commentable_type)
     id = @comment.commentable_id
-    unless model.constantize.my(current_user).find_by_id(id)
+    unless model.my(current_user).find_by_id(id)
       respond_to_related_not_found(model.downcase)
     end
   end
@@ -49,9 +50,9 @@ class CommentsController < ApplicationController
       comment_params.merge(user_id: current_user.id)
     )
     # Make sure commentable object exists and is accessible to the current user.
-    model = @comment.commentable_type
+    model = find_class(@comment.commentable_type)
     id = @comment.commentable_id
-    if model.constantize.my(current_user).find_by_id(id)
+    if model.my(current_user).find_by_id(id)
       @comment.save
       respond_with(@comment)
     else

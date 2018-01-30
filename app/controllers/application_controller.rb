@@ -246,4 +246,10 @@ class ApplicationController < ActionController::Base
       user_params.permit(:username, :email, :password, :password_confirmation)
     end
   end
+
+  def find_class(asset)
+    classes = Dir['app/models/**/*.rb'].map { |f| File.basename(f, '.*').camelize }
+    find = classes.find { |m| m == asset.camelize }
+    find.classify.safe_constantize
+  end
 end
