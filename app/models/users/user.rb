@@ -92,7 +92,7 @@ class User < ActiveRecord::Base
   validates :username,
             uniqueness: { message: :username_taken, case_sensitive: false },
             presence: { message: :missing_username },
-            format: { with: /\A[a-z0-9_-]+\z/i }
+            format: { with: /[a-z0-9_-]+/i }
   validates :password,
             presence: { if: :password_required? },
             confirmation: true

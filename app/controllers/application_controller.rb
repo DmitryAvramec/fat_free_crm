@@ -248,8 +248,12 @@ class ApplicationController < ActionController::Base
   end
 
   def find_class(asset)
-    classes = Dir['app/models/**/*.rb'].map { |f| File.basename(f, '.*').camelize }
-    find = classes.find { |m| m == asset.camelize }
-    find.classify.safe_constantize
+    classes = ActiveRecord::Base.connection.tables.map { |f| f.classify }
+    find = classes.find { |m| m == asset.classify }
+    if find
+      find.safe_constantize
+    else
+      raise "Unknown resourse"
+    end
   end
 end

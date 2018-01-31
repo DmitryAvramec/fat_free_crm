@@ -18,7 +18,7 @@ class CommentsController < ApplicationController
       @comments = @asset.comments.order("created_at DESC")
     end
     respond_with(@comments) do |format|
-      format.html { redirect_to @asset.merge(:only_path => true) }
+      format.html { redirect_to @asset }
     end
   rescue ActiveRecord::RecordNotFound # Kicks in if @asset was not found.
     flash[:warning] = t(:msg_assets_not_available, "notes")
@@ -84,7 +84,14 @@ class CommentsController < ApplicationController
 
   def comment_params
     return {} unless params[:comment]
-    params[:comment].permit!
+    params.require(:comment).permit(
+      :user_id,
+      :commentable_type,
+      :private,
+      :title,
+      :comment,
+      :state
+    )
   end
 
   private
