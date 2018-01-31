@@ -246,4 +246,14 @@ class ApplicationController < ActionController::Base
       user_params.permit(:username, :email, :password, :password_confirmation)
     end
   end
+
+  def find_class(asset)
+    classes = ActiveRecord::Base.connection.tables.map { |f| f.classify }
+    find = classes.find { |m| m == asset.classify }
+    if find
+      find.safe_constantize
+    else
+      raise "Unknown resourse"
+    end
+  end
 end
