@@ -51,6 +51,7 @@ class Opportunity < ActiveRecord::Base
   scope :pipeline,    -> { where("opportunities.stage IS NULL OR (opportunities.stage != 'won' AND opportunities.stage != 'lost')") }
   scope :unassigned,  -> { where("opportunities.assigned_to IS NULL") }
   scope :weighted_sort, -> { select('*, amount*probability') }
+  
   # Search by name OR id
   scope :text_search, ->(query) {
     if query.match?(/\A\d+\z/)
